@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bleebl33-dojo_exporter"
+version = "0.0.1"
+dependencies = [
+    'build>="0.8.0"',
+    'prometheus_client>="0.15.0"',
+]
