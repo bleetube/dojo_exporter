@@ -1,18 +1,34 @@
+from sys import exit
+from os import environ, _exit
 from json import loads
-from os import environ
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 # https://github.com/prometheus/client_python
-from prometheus_client import start_http_server
-from prometheus_client.core import GaugeMetricFamily, REGISTRY
-import random, time
+from prometheus_client import start_http_server, Summary
+from prometheus_client.core import GaugeMetricFamily, SummaryMetricFamily, REGISTRY
+from time import sleep
+import random
 
-#REQUEST_TIME = Summary('request_processing_seconds', 'Time spent processing request')
+REQUEST_TIME = Summary('request_processing_seconds', 'Time spent processing request')
 
 class DojoCollector(object):
-    def collect(self):
-        pass
+    def __init__(self) -> None:
+        """Read environment variables."""
+        if environ.get("DOJO_APIKEY"):
+            self.DOJO_APIKEY = environ.get("DOJO_APIKEY")
+        else:
+            quit( "Error: DOJO_APIKEY environment variable is required." )
+
+        if environ.get("NET_DMZ_NGINX_IPV4"):
+            self.NET_DMZ_NGINX_IPV4 = environ.get("NET_DMZ_NGINX_IPV4")
+        else:
+            self.NET_DMZ_NGINX_IPV4 = "172.29.1.3"
+
+        if environ.get("DOJO_BASE_URL"):
+            self.DOJO_BASE_URL = environ.get("DOJO_BASE_URL")
+        else:
+            self.DOJO_BASE_URL = f"http://{self.NET_DMZ_NGINX_IPV4}"
 
     def get_dojo_jwt(self, DOJO_BASE_URL: str, DOJO_APIKEY: str) -> str:
         """Get a JSON Web Token (JWT) by making one http request to a self-hosted Samourai Dojo instance."""
@@ -51,40 +67,39 @@ class DojoCollector(object):
         except URLError as e:
             # Corner case: If you see "<urlopen error [Errno -5] No address associated with hostname>"
             # It's a DNS error and you might just need to set a static hosts file entry for your Dojo FQDN.
-            # Most people don't use FQDNs for their Dojo instances, so this is a rare error.
             print( f"URLError: {status_request_url} \n{e}")
             return None
         except Exception as e:
             print( f"Exception: {status_request_url} \n{e}")
             return None
 
-    #@REQUEST_TIME.time()
-    def get_dojo_metrics(self):
-        if environ.get("DOJO_APIKEY"):
-            DOJO_APIKEY = environ.get("DOJO_APIKEY")
-        else:
-            quit( "Error: DOJO_APIKEY environment variable is required." )
+    @REQUEST_TIME.time()
+    def collect(self):
+        DOJO_JWT = self.get_dojo_jwt( self.DOJO_BASE_URL, self.DOJO_APIKEY )
+        DOJO_STATUS = self.get_dojo_status( DOJO_JWT, self.DOJO_BASE_URL, self.DOJO_APIKEY )
+        try:
+            yield GaugeMetricFamily('dojo_ws_clients', 'Block height', value=DOJO_STATUS['ws']['clients'] )
+            yield GaugeMetricFamily('dojo_ws_clients', 'Block height', value=DOJO_STATUS['ws']['sessions'] )
+            yield GaugeMetricFamily('dojo_ws_clients', 'Block height', value=DOJO_STATUS['ws']['max'] )
+            yield GaugeMetricFamily('dojo_bitcoind_blocks', 'Block height', value=DOJO_STATUS['blocks'] )
+            yield GaugeMetricFamily('dojo_indexer_max_height', 'Indexer maximum block height', value=DOJO_STATUS['indexer']['maxHeight'] )
+            # TODO: 
+            # - DOJO_STATUS['uptime'] needs to be converted to seconds.
+            # - DOJO_STATUS['memory'] needs to be converted to bytes.
+            # - DOJO_STATUS['indexer']['type'] needs to be converted to a label.
+            # - DOJO_STATUS['indexer']['url'] needs to be converted to a label.
 
-        if environ.get("NET_DMZ_NGINX_IPV4"):
-            NET_DMZ_NGINX_IPV4 = environ.get("NET_DMZ_NGINX_IPV4")
-        else:
-            NET_DMZ_NGINX_IPV4 = "172.29.1.3"
-
-        if environ.get("DOJO_BASE_URL"):
-            DOJO_BASE_URL = environ.get("DOJO_BASE_URL")
-        else:
-            DOJO_BASE_URL = f"http://{NET_DMZ_NGINX_IPV4}"
-
-        DOJO_JWT = self.get_dojo_jwt( DOJO_BASE_URL, DOJO_APIKEY )
-        DOJO_STATUS = self.get_dojo_status( DOJO_JWT, DOJO_BASE_URL, DOJO_APIKEY )
-        print( DOJO_STATUS )
-
-        quit( "We here now." )
-    #   derp.labels('derp').set( derp )
+            print( DOJO_STATUS )
+        except Exception as e:
+            print( f"Exception: {DOJO_STATUS} \n{e}")
+            return None
 
     
 
 def main():
+    """Start the prometheus client child process and register the DojoCollector to it."""
+
+    # Optional environment variable to set the bind options.
     if environ.get("METRICS_PORT"):
         METRICS_PORT = environ.get("METRICS_PORT")
     else:
@@ -94,11 +109,23 @@ def main():
     else:
         METRICS_BIND = "127.0.0.1"
 
-    # listen for requests (default: 127.0.0.1:9102)
+    # Prometheus client listener (default: 127.0.0.1:9102)
     start_http_server(METRICS_PORT, METRICS_BIND)
+    REGISTRY.register(DojoCollector())
 
-    dojo_collector = DojoCollector()
-    dojo_collector.get_dojo_metrics()
+#   dojo_collector = DojoCollector()
+#   dojo_collector.collect()
+
+    # This is a hack to prevent the child process from exiting.
+    while True:
+        sleep(10)
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    # Catch cntrl+c
+    except KeyboardInterrupt:
+        try:
+            exit(0)
+        except SystemExit:
+            _exit(0)
