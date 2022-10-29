@@ -19,7 +19,7 @@ export DOJO_BASE_URL=http://${NET_DMZ_NGINX_IPV4}   # Optional. Default value sh
 I would recommend running this as an unprivileged user via systemd (or anything comparable):
 
 ```bash
-useradd -b /opt -ms $(which nologin) dojo_exporter
+useradd -mb /opt -k /dev/null -s $(which nologin) dojo_exporter
 ```
 
 Create `/etc/systemd/system/dojo_exporter.service`:
