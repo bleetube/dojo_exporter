@@ -18,7 +18,7 @@ if [ -f "${DOJO_PATH}/docker/my-dojo/conf/docker-node.conf" ]; then
 fi
 
 # URL to Dojo tracker API
-DOJO_BASE_URL=http://${NET_DMZ_NGINX_IPV4}
+#DOJO_BASE_URL=http://${NET_DMZ_NGINX_IPV4}
 # Or if you're polling remotely via a reverse proxy with tls 1.3, like me:
 #DOJO_BASE_URL=https://dojo.example.com
 # (Optional) You could also poll via the onion address through your tor daemon's socks5 proxy.
@@ -33,7 +33,7 @@ if [[ ! $(which jq) ]] ; then echo "Error: Missing required dependency: jq" ; ex
 
 # curl once to acquire a JSON Web Token from Dojo
 TOKEN=$(curl ${SOCKS} -q "${DOJO_BASE_URL}/v2/auth/login" \
-  --data-raw "apikey=${DOJO_APIKEY}&at=null"  2>/dev/null |
+  --data-raw "apikey=${DOJO_APIKEY}"  2>/dev/null |
   jq -r '.authorizations.access_token')
 
 if [[ "${TOKEN}" ]]; then
