@@ -25,6 +25,7 @@ fi
 # Although it could fail on false positives if tor connectivity is not optimal.
 #SOCKS="--socks5-hostname 127.0.0.1:9050"
 #DOJO_BASE_URL=http://e2412ed3841ed782f4a50130e1daec77ef9596b4a42c26d7719294cb6facf5fd.onion
+# In hindsight, it's totally crazy to poll the onion address directly.
 
 # Sanity checks
 if [[ ! $(id -u) ]] ; then echo "Do not run this as root. You're insane." ; exit 1 ; fi

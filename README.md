@@ -1,6 +1,6 @@
-# Basic openmetrics for Samourai Dojo
+# Basic openmetrics for Dojo
 
-A component for monitoring your Dojo health, which can be integrated with a self-hosted SRE stack. If you don't have one set up already, this won't be useful to you. It's basically a wrapper on two calls to `curl`.
+A component for monitoring your self-hosted [Samourai Dojo](https://code.samourai.io/dojo/samourai-dojo), which can be integrated with your self-hosted SRE stack. If you don't have one set up already, this won't be useful to you. It's basically a wrapper on two calls to `curl`.
 
 ## Installation and Usage
 
@@ -57,7 +57,7 @@ python -m <TBD>
 
 ## Roadmap
 
-- ~~MVP~~
+- MVP
 - Change `print()` messages into sensible logging with configuration debug levels.
 - Review Dojo `/admin/dmt/status/status.js` to possibly discover more metrics.
 - Dockerfile
