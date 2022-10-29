@@ -1,17 +1,10 @@
 import json
 from os import environ
 from urllib.error import URLError
+from urllib.request import Request, urlopen, urlretrieve, build_opener, install_opener
 
 # https://github.com/prometheus/client_python
 from prometheus_client import start_http_server, Summary, Gauge
-#import random
-#import time
-
-from urllib.request import Request, urlopen, urlretrieve, build_opener, install_opener
-# setup urllib user-agent (required for urlretrieve)
-#opener=build_opener()
-#opener.addheaders=[('User-Agent','Mozilla/5.0')]
-#install_opener(opener)
 
 def get_dojo_jwt(DOJO_BASE_URL: str, DOJO_APIKEY: str) -> str:
     """Get a JSON Web Token (JWT) by making one http request to a self-hosted Samourai Dojo instance."""
