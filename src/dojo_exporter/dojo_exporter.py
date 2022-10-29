@@ -4,8 +4,8 @@ from urllib.error import URLError
 
 # https://github.com/prometheus/client_python
 from prometheus_client import start_http_server, Summary, Gauge
-import random
-import time
+#import random
+#import time
 
 from urllib.request import Request, urlopen, urlretrieve, build_opener, install_opener
 # setup urllib user-agent (required for urlretrieve)
@@ -14,8 +14,6 @@ from urllib.request import Request, urlopen, urlretrieve, build_opener, install_
 #install_opener(opener)
 
 def get_dojo_jwt(DOJO_BASE_URL: str, DOJO_APIKEY: str) -> str:
-# --data-raw "apikey=${DOJO_APIKEY}&at=null"  2>/dev/null |
-# jq -r '.authorizations.access_token')
     jwt_request_url = f"{DOJO_BASE_URL}/v2/auth/login"
     jwt_request_params = f"apikey={DOJO_APIKEY}"
     jwt_request = Request( 
@@ -25,20 +23,13 @@ def get_dojo_jwt(DOJO_BASE_URL: str, DOJO_APIKEY: str) -> str:
     try:
         with urlopen( jwt_request ) as url:
             # Convert the http body response (string) into a dictionary.
-            dojo_response = json.loads( url.read().decode() )
+            return json.loads( url.read().decode() )
     except URLError as e:
         print( f"URLError: {jwt_request_url} \n{e}")
+        return None
     except Exception as e:
         print( f"Exception: {jwt_request_url} \n{e}")
-
-    try:
-        return dojo_response["authorizations"]["access_token1"]
-    except:
-        print( f"Exception: dojo_response: {dojo_response}")
-
-    print( "Failed to authenticate to Dodjo. Check configuration.")
-    return None
-
+        return None
 
 def update_metrics():
 #   derp.labels('derp').set( derp )
@@ -67,7 +58,6 @@ def main():
     else:
         quit( "We here now." )
     
-    # TODO: handle web request failures gracefully. otherwise the script crashes.
     # listen for requests
 #   start_http_server(9102, '127.0.0.1')
 
