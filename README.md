@@ -64,4 +64,4 @@ python -m <TBD>
 
 ## Security Trade-Offs
 
-Only a small number of dependencies are used to avoid any unnecessary exposure to [supply chain](https://cloud.google.com/software-supply-chain-security/docs/attack-vectors) attacks. The risk would be that the Dojo apikey is leaked, which could compromise user privacy. There should be no risk of losing funds as private keys are never transmitted to the dojo. You should never run this software on a machine with a hot wallet.
+A small number of dependencies are used which still causes nominal exposure to [supply chain](https://cloud.google.com/software-supply-chain-security/docs/attack-vectors) attacks. The risk would be that the Dojo apikey is leaked, which could compromise user privacy. There should be no risk of losing funds as private keys are never transmitted to the dojo. You should never run this software on a machine with a hot wallet.

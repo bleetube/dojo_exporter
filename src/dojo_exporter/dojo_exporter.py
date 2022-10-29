@@ -3,6 +3,8 @@ from os import environ, _exit
 from json import loads
 from urllib.error import URLError
 from urllib.request import Request, urlopen
+from datetime import timedelta
+import bitmath
 
 # https://github.com/prometheus/client_python
 from prometheus_client import start_http_server, Summary
@@ -73,23 +75,37 @@ class DojoCollector(object):
             print( f"Exception: {status_request_url} \n{e}")
             return None
 
+    def convert_duration_to_seconds(self, duration: str) -> int:
+        """Convert the Dojo uptime duration string (e.g. "028:23:42:58") into seconds."""
+        duration = duration.split(":")
+        seconds = 0
+        seconds += int(duration[0]) * 86400 # days
+        seconds += int(duration[1]) * 3600  # hours
+        seconds += int(duration[2]) * 60    # minutes
+        seconds += int(duration[3])         # seconds
+        return int(seconds)
+
     @REQUEST_TIME.time()
     def collect(self):
         DOJO_JWT = self.get_dojo_jwt( self.DOJO_BASE_URL, self.DOJO_APIKEY )
         DOJO_STATUS = self.get_dojo_status( DOJO_JWT, self.DOJO_BASE_URL, self.DOJO_APIKEY )
         try:
-            yield GaugeMetricFamily('dojo_ws_clients', 'Block height', value=DOJO_STATUS['ws']['clients'] )
-            yield GaugeMetricFamily('dojo_ws_clients', 'Block height', value=DOJO_STATUS['ws']['sessions'] )
-            yield GaugeMetricFamily('dojo_ws_clients', 'Block height', value=DOJO_STATUS['ws']['max'] )
-            yield GaugeMetricFamily('dojo_bitcoind_blocks', 'Block height', value=DOJO_STATUS['blocks'] )
+            DOJO_UPTIME=self.convert_duration_to_seconds( DOJO_STATUS["uptime"] )
+            DOJO_MEMORY=bitmath.parse_string(DOJO_STATUS["memory"]).bytes
+            yield GaugeMetricFamily('dojo_uptime_seconds', 'Dojo tracker uptime', value=DOJO_UPTIME )
+            yield GaugeMetricFamily('dojo_uptime_seconds', 'Dojo tracker uptime', value=DOJO_MEMORY )
+            yield GaugeMetricFamily('dojo_block_height', 'Block height', value=DOJO_STATUS['blocks'] )
+            yield GaugeMetricFamily('dojo_ws_clients', 'HTTP Websocket clients', value=DOJO_STATUS['ws']['clients'] )
+            yield GaugeMetricFamily('dojo_ws_clients', 'HTTP Websocket sessions', value=DOJO_STATUS['ws']['sessions'] )
+            yield GaugeMetricFamily('dojo_ws_clients', 'HTTP Websocket max', value=DOJO_STATUS['ws']['max'] )
             yield GaugeMetricFamily('dojo_indexer_max_height', 'Indexer maximum block height', value=DOJO_STATUS['indexer']['maxHeight'] )
-            # TODO: 
-            # - DOJO_STATUS['uptime'] needs to be converted to seconds.
-            # - DOJO_STATUS['memory'] needs to be converted to bytes.
-            # - DOJO_STATUS['indexer']['type'] needs to be converted to a label.
-            # - DOJO_STATUS['indexer']['url'] needs to be converted to a label.
 
-            print( DOJO_STATUS )
+            # TODO: 
+            # - DOJO_STATUS['indexer']['type'] needs to be converted to a label.
+#           print( DOJO_STATUS['indexer']['type'] )
+            # - DOJO_STATUS['indexer']['url'] needs to be converted to a label.
+#           print( DOJO_STATUS['indexer']['url'] )
+
         except Exception as e:
             print( f"Exception: {DOJO_STATUS} \n{e}")
             return None
