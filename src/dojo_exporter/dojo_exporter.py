@@ -98,19 +98,19 @@ class DojoCollector(object):
             yield GaugeMetricFamily('dojo_ws_clients', 'HTTP Websocket clients', value=DOJO_STATUS['ws']['clients'] )
             yield GaugeMetricFamily('dojo_ws_clients', 'HTTP Websocket sessions', value=DOJO_STATUS['ws']['sessions'] )
             yield GaugeMetricFamily('dojo_ws_clients', 'HTTP Websocket max', value=DOJO_STATUS['ws']['max'] )
-            yield GaugeMetricFamily('dojo_indexer_max_height', 'Indexer maximum block height', value=DOJO_STATUS['indexer']['maxHeight'] )
+            yield GaugeMetricFamily('dojo_indexer_max_height', 'Indexer maximum block height', DOJO_STATUS['indexer']['maxHeight'] )
 
-            # TODO: 
-            # - DOJO_STATUS['indexer']['type'] needs to be converted to a label.
-#           print( DOJO_STATUS['indexer']['type'] )
-            # - DOJO_STATUS['indexer']['url'] needs to be converted to a label.
-#           print( DOJO_STATUS['indexer']['url'] )
+            # Labels and values are mutually exclusive.
+            g = GaugeMetricFamily( "dojo_indexer", "Indexer type and url", labels=[ "type", "url" ])
+            # Enforce str() labels because the url can be null/None, resulting in an AttributeError.
+            g.add_metric([ str( DOJO_STATUS[ 'indexer' ][ 'type' ]), 
+                str( DOJO_STATUS[ 'indexer' ][ 'url' ])],
+                1)
+            yield g
 
         except Exception as e:
             print( f"Exception: {DOJO_STATUS} \n{e}")
             return None
-
-    
 
 def main():
     """Start the prometheus client child process and register the DojoCollector to it."""

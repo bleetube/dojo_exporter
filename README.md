@@ -57,7 +57,7 @@ python -m <TBD>
 
 ## Roadmap
 
-- MVP
+- ~~MVP~~
 - Change `print()` messages into sensible logging with configuration debug levels.
 - Review Dojo `/admin/dmt/status/status.js` to possibly discover more metrics.
 - Dockerfile
