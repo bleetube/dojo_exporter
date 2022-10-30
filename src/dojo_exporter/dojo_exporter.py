@@ -93,7 +93,7 @@ class DojoCollector(object):
             DOJO_UPTIME=self.convert_duration_to_seconds( DOJO_STATUS["uptime"] )
             DOJO_MEMORY=bitmath.parse_string(DOJO_STATUS["memory"]).bytes
             yield GaugeMetricFamily('dojo_uptime_seconds', 'Dojo tracker uptime', value=DOJO_UPTIME )
-            yield GaugeMetricFamily('dojo_uptime_seconds', 'Dojo tracker uptime', value=DOJO_MEMORY )
+            yield GaugeMetricFamily('dojo_memory_bytes', 'Dojo tracker uptime', value=DOJO_MEMORY )
             yield GaugeMetricFamily('dojo_block_height', 'Block height', value=DOJO_STATUS['blocks'] )
             yield GaugeMetricFamily('dojo_ws_clients', 'HTTP Websocket clients', value=DOJO_STATUS['ws']['clients'] )
             yield GaugeMetricFamily('dojo_ws_clients', 'HTTP Websocket sessions', value=DOJO_STATUS['ws']['sessions'] )
