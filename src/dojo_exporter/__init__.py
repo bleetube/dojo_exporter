@@ -4,14 +4,12 @@ from platform import node
 from json import loads
 from urllib.error import URLError
 from urllib.request import Request, urlopen
-from datetime import timedelta
 import bitmath
 
 # https://github.com/prometheus/client_python
 from prometheus_client import start_http_server, Summary
-from prometheus_client.core import GaugeMetricFamily, SummaryMetricFamily, REGISTRY
+from prometheus_client.core import GaugeMetricFamily, REGISTRY
 from time import sleep
-import random
 
 REQUEST_TIME = Summary('request_processing_seconds', 'Time spent processing request')
 
