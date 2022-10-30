@@ -1,4 +1,4 @@
-# Basic openmetrics for Dojo
+# Prometheus openmetrics for Dojo
 
 ![sample Grafana dashboard](tests/dojo_exporter-01.jpg)
 

@@ -1,5 +1,6 @@
 from sys import exit
 from os import environ, _exit
+from platform import node
 from json import loads
 from urllib.error import URLError
 from urllib.request import Request, urlopen
@@ -107,6 +108,11 @@ class DojoCollector(object):
                 str( DOJO_STATUS[ 'indexer' ][ 'url' ])],
                 1)
             yield g
+
+            # Node name
+            n = GaugeMetricFamily( "dojo_platform", "Dojo Node Name", labels=[ "node" ])
+            n.add_metric([ node() ], 1)
+            yield n
 
         except Exception as e:
             print( f"Exception: {DOJO_STATUS} \n{e}")
