@@ -54,7 +54,7 @@ source .venv/bin/activate
 pip install --upgrade pip
 pip install --editable .
 source .env
-python src/dojo_exporter/dojo_collector.py
+dojo_exporter
 ```
 
 ## Roadmap
