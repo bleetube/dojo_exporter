@@ -7,7 +7,7 @@ A devops component for monitoring your self-hosted [Samourai Dojo](https://code.
 ## Installation and Usage
 
 ``` bash
-pip install dojo_exporter
+pip install dojo-exporter
 ```
 
 Define the connection parameters to your Dojo via environment variables. There are multiple ways you can set it up. One example is to create an `.env` file with the following contents:
