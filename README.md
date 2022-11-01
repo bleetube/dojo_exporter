@@ -1,6 +1,6 @@
 # Prometheus openmetrics for Dojo
 
-![sample Grafana dashboard](https://raw.githubusercontent.com/bleebl33/dojo_exporter/main/dashboards/dojo_exporter-01.jpg)
+![sample Grafana dashboard](https://github.com/bleebl33/dojo_exporter/raw/main/dashboards/dojo_exporter-01.jpg)
 
 A devops component for monitoring your self-hosted [Samourai Dojo](https://code.samourai.io/dojo/samourai-dojo), which can be integrated with your self-hosted SRE stack. If you don't have one set up already, this won't be useful to you. It's basically a wrapper on two calls to `curl`.
 
