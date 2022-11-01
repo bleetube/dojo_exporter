@@ -44,17 +44,15 @@ class DojoCollector(object):
                 # Convert the http body response (string) into a dictionary.
                 jwt_result = loads( url.read().decode() )
         except URLError as e:
-            print( f"jwt_request URLError: {jwt_request_url} \n{e}")
-            return None
+            quit( f"jwt_request URLError: {jwt_request_url} \n{e}")
         except Exception as e:
-            print( f"jwt_request Exception: {jwt_request_url} \n{e}")
-            return None
+            quit( f"jwt_request Exception: {jwt_request_url} \n{e}")
         
         try:
             DOJO_JWT = jwt_result["authorizations"]["access_token"]
             return DOJO_JWT
         except Exception as e:
-            print( f"jwt_result Exception: {jwt_result} \n{e}")
+            quit( f"jwt_result Exception: {jwt_result} \n{e}")
             return None
 
     def get_dojo_status(self, DOJO_JWT: str, DOJO_BASE_URL: str, DOJO_APIKEY: str) -> dict:
@@ -68,20 +66,44 @@ class DojoCollector(object):
         except URLError as e:
             # Corner case: If you see "<urlopen error [Errno -5] No address associated with hostname>"
             # It's a DNS error and you might just need to set a static hosts file entry for your Dojo FQDN.
-            print( f"URLError: {status_request_url} \n{e}")
-            return None
+            quit( f"URLError: {status_request_url} \n{e}")
         except Exception as e:
-            print( f"Exception: {status_request_url} \n{e}")
-            return None
+            quit( f"Exception: {status_request_url} \n{e}")
 
     def convert_duration_to_seconds(self, duration: str) -> int:
-        """Convert the Dojo uptime duration string (e.g. "028:23:42:58") into seconds."""
+        """Convert the Dojo uptime duration string (e.g. "028:23:42:58" or "23:42:58") into seconds."""
         duration = duration.split(":")
         seconds = 0
-        seconds += int(duration[0]) * 86400 # days
-        seconds += int(duration[1]) * 3600  # hours
-        seconds += int(duration[2]) * 60    # minutes
-        seconds += int(duration[3])         # seconds
+
+        # "match" was introduced in Python 3.10
+        # Ubuntu 20.04 is still on Python 3.8 and I don't want to exclude it yet.
+#       t = len(duration)
+#       while t > 0:
+#           t -= 1
+#           match t:
+#               case 3: # days
+#                   seconds += int(duration[t]) * 86400
+#               case 2: # hours
+#                   seconds += int(duration[t]) * 3600
+#               case 1: # minutes
+#                   seconds += int(duration[t]) * 60
+#               case 0: # seconds
+#                   seconds += int(duration[t])
+
+        if len(duration) == 4:
+            seconds += int(duration[0]) * 86400 # days
+            seconds += int(duration[1]) * 3600  # hours
+            seconds += int(duration[2]) * 60    # minutes
+            seconds += int(duration[3])         # seconds
+        elif len(duration) == 3:
+            seconds += int(duration[0]) * 3600  # hours
+            seconds += int(duration[1]) * 60    # minutes
+            seconds += int(duration[2])         # seconds
+        elif len(duration) == 2:
+            seconds += int(duration[0]) * 60    # minutes
+            seconds += int(duration[1])         # seconds
+        elif len(duration) == 1:
+            seconds += int(duration[0])         # seconds
         return int(seconds)
 
     @REQUEST_TIME.time()
@@ -113,8 +135,7 @@ class DojoCollector(object):
             yield n
 
         except Exception as e:
-            print( f"Exception: {DOJO_STATUS} \n{e}")
-            return None
+            quit( f"Exception: {DOJO_STATUS} \n{e}")
 
 def main():
     """Start the prometheus client child process and register the DojoCollector to it."""
