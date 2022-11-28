@@ -68,7 +68,7 @@ Note that there is a difference between `source .env` and systemd EnvironmentFil
 
 ## Security
 
-This goes without saying for most cases: A number of necessray dependencies are used which causes nominal exposure to [supply chain](https://cloud.google.com/software-supply-chain-security/docs/attack-vectors) attacks. The risk would be that the Dojo apikey is leaked, which could compromise user privacy. There should be no risk of losing funds as private keys are never transmitted to the dojo. You should never run this software on a machine with a hot wallet.
+This goes without saying for most cases: A number of necessary dependencies are used which causes nominal exposure to [supply chain](https://cloud.google.com/software-supply-chain-security/docs/attack-vectors) attacks. The risk would be that the Dojo apikey is leaked, which could compromise user privacy. There should be no risk of losing funds as private keys are never transmitted to the dojo. You should never run this software on a machine with a hot wallet.
 
 Furthermore you can harden the installation by keeping it in a virtual environment, rather than installing it globally. Afterwards you can find the path of the command with `which dojo_exporter` and then set your systemd service up accordingly. e.g. 
 
