@@ -1,10 +1,12 @@
 from sys import exit
-from os import environ, _exit
+from os import environ, getcwd, _exit
 from platform import node
 from json import loads
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 import bitmath
+from dotenv import dotenv_values
+config = dotenv_values(f"{getcwd()}/.env")
 
 # https://github.com/prometheus/client_python
 from prometheus_client import start_http_server, Summary
@@ -124,7 +126,8 @@ class DojoCollector(object):
             # Labels and values are mutually exclusive.
             g = GaugeMetricFamily( "dojo_indexer", "Indexer type and url", labels=[ "type", "url" ])
             # Enforce str() labels because the url can be null/None, resulting in an AttributeError.
-            g.add_metric([ str( DOJO_STATUS[ 'indexer' ][ 'type' ]), 
+            g.add_metric([ 
+                str( DOJO_STATUS[ 'indexer' ][ 'type' ]), 
                 str( DOJO_STATUS[ 'indexer' ][ 'url' ])],
                 1)
             yield g

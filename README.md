@@ -2,11 +2,12 @@
 
 ![sample Grafana dashboard](https://github.com/bleebl33/dojo_exporter/raw/main/dashboards/dojo_exporter-01.jpg)
 
-A devops component for monitoring your self-hosted [Samourai Dojo](https://code.samourai.io/dojo/samourai-dojo), which can be integrated with your self-hosted SRE stack. If you don't have one set up already, this won't be useful to you. It's basically a wrapper on two calls to `curl`.
+A devops component for monitoring your self-hosted [Samourai Dojo](https://code.samourai.io/dojo/samourai-dojo), which can be integrated with your self-hosted SRE stack. If you don't have one set up already, this won't be useful to you. It's a simple python script that gets the JWT, calls the status endpoint, then transforms the results into prometheus metrics.
 
 ## Installation and Usage
 
 ``` bash
+pip install --upgrade pip
 pip install dojo-exporter
 ```
 
@@ -53,7 +54,6 @@ python -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install --editable .
-source .env
 dojo_exporter
 ```
 
