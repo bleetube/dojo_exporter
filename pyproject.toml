@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dojo_exporter"
-version = "0.1.2"
+version = "0.1.4"
 description = "Devops monitoring tool for Samourai Dojo"
 readme = "README.md"
 authors = [{ name = "blee", email = "blee@bitcoiner.social" }]

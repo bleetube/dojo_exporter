@@ -18,20 +18,9 @@ REQUEST_TIME = Summary('request_processing_seconds', 'Time spent processing requ
 class DojoCollector(object):
     def __init__(self) -> None:
         """Read environment variables."""
-        if environ.get("DOJO_APIKEY"):
-            self.DOJO_APIKEY = environ.get("DOJO_APIKEY")
-        else:
-            quit( "Error: DOJO_APIKEY environment variable is required." )
-
-        if environ.get("NET_DMZ_NGINX_IPV4"):
-            self.NET_DMZ_NGINX_IPV4 = environ.get("NET_DMZ_NGINX_IPV4")
-        else:
-            self.NET_DMZ_NGINX_IPV4 = "172.29.1.3"
-
-        if environ.get("DOJO_BASE_URL"):
-            self.DOJO_BASE_URL = environ.get("DOJO_BASE_URL")
-        else:
-            self.DOJO_BASE_URL = f"http://{self.NET_DMZ_NGINX_IPV4}"
+        self.DOJO_APIKEY = config.get("DOJO_APIKEY") or quit( "Error: DOJO_APIKEY environment variable is required." )
+        self.NET_DMZ_NGINX_IPV4 = config.get("NET_DMZ_NGINX_IPV4", "172.29.1.3")
+        self.DOJO_BASE_URL = config.get("DOJO_BASE_URL", f"http://{self.NET_DMZ_NGINX_IPV4}")
 
     def get_dojo_jwt(self, DOJO_BASE_URL: str, DOJO_APIKEY: str) -> str:
         """Get a JSON Web Token (JWT) by making one http request to a self-hosted Samourai Dojo instance."""
@@ -142,19 +131,10 @@ class DojoCollector(object):
 
 def main():
     """Start the prometheus client child process and register the DojoCollector to it."""
+    METRICS_PORT = config.get("METRICS_PORT", 9102)
+    METRICS_BIND = config.get("METRICS_BIND", "127.0.0.1")
 
-    # Optional environment variable to set the bind options.
-    if environ.get("METRICS_PORT"):
-        METRICS_PORT = environ.get("METRICS_PORT")
-    else:
-        METRICS_PORT = 9102
-    if environ.get("METRICS_BIND"):
-        METRICS_BIND = environ.get("METRICS_BIND")
-    else:
-        METRICS_BIND = "127.0.0.1"
-
-    # Prometheus client listener (default: 127.0.0.1:9102)
-    start_http_server(METRICS_PORT, METRICS_BIND)
+    start_http_server(int(METRICS_PORT), METRICS_BIND)
     REGISTRY.register(DojoCollector())
 
 #   dojo_collector = DojoCollector()

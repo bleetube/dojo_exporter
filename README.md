@@ -14,9 +14,11 @@ pip install dojo-exporter
 Define the connection parameters to your Dojo via environment variables. There are multiple ways you can set it up. One example is to create an `.env` file with the following contents:
 
 ```bash
-DOJO_APIKEY=<password>                       # Required
-NET_DMZ_NGINX_IPV4=172.29.1.3                # Optional. Default value shown
-DOJO_BASE_URL=http://${NET_DMZ_NGINX_IPV4}   # Optional. Default value shown
+DOJO_APIKEY=<password>                     # Required
+NET_DMZ_NGINX_IPV4=172.29.1.3              # Optional. Default value shown
+DOJO_BASE_URL=http://${NET_DMZ_NGINX_IPV4} # Optional. Default value shown
+METRICS_BIND=127.0.0.1                     # Optional. Default value shown
+METRICS_PORT=9102                          # Optional. Default value shown
 ```
 
 I would recommend running this as an unprivileged user via systemd (or anything comparable):
